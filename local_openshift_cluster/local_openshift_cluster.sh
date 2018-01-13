@@ -28,8 +28,11 @@ function setupnetwork {
     #  firewall-cmd --set-log-denied=all
     #  journalctl -k -f
 
-    # Use *.cluster.test for the service addresses instead of external xip.io
+    # Run our own DNS server on the host
     # dnsmasq forwards local queries and queries from pods to OpenShift SkyDNS
+    # Use *.cluster.test for the service addresses instead of external xip.io
+    # Similar to:
+    # https://developers.redhat.com/blog/2015/11/19/dns-your-openshift-v3-cluster/
     cat > /etc/docker/daemon.json <<EOF
 {
     "dns": [
@@ -52,9 +55,8 @@ interface=docker0
 #log-queries
 EOF
 
-    # Optional: for setting for nice looking DNS addresses (e.g. *.example.com),
-    #           use local dnsmasq server. See:
-    # https://developers.redhat.com/blog/2015/11/19/dns-your-openshift-v3-cluster/
+    # Optional: Enable resolving internal .cluster.local addresses from this host
+    #sed -i "s/mdns4_minimal \[NOTFOUND=return\]/mdns4_minimal/" /etc/nsswitch.conf
 
     systemctl daemon-reload
     systemctl restart docker
