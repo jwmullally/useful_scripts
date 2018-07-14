@@ -90,7 +90,10 @@ htpasswd -b users.htpasswd developer developer
 popd
 
 systemctl start origin
+
 oc login -u system:admin
 oc adm policy add-cluster-role-to-user cluster-admin admin
+oc env dc/router ROUTER_ALLOW_WILDCARD_ROUTES=true -n default
+
 systemctl enable origin
 systemctl status origin --no-pager
